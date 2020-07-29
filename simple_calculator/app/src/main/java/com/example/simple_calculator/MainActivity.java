@@ -278,18 +278,21 @@ public class MainActivity extends AppCompatActivity {
     private boolean isNum(String s) {
         //boolean isNumber=false;
         for (int i = 0; i <= 10; i++) {
-            if (s.equals(number[i])) {
-                return true;
+            if (!s.equals(number[i])) {
+                return false;
             }
             //isNumber= s.equals(number[i]);
         }
-        return false;
+        return true;
     }
 
     //the method of calculation
     private void calculate() {
+        //if there is a calculate loop error
+        int count=0;
         //screen2.setText(String.format("%s original \n", screen2.getText()));
-        String xxx = calculate((String) screen.getText());
+        String xxx = (String) screen.getText();
+        calculate(xxx);
 
         //set screen past to show the equation that have be calculated
         screen2.setText(String.format("%s  calculates", screen2.getText()));
@@ -304,96 +307,115 @@ public class MainActivity extends AppCompatActivity {
     private String calculate(String s) {
         double val0 = 0;
         double val1 = 0;
-        //System.out.print("calcukator");
+        //System.out.print("calculator");
 
+        //to check is there any operation
         if (s.contains(" ")) {
-            screen2.setText(String.format("%s  1st contain blank ", screen2.getText()));
+            System.out.println("the string: "+ s);
+
+            //if the string still contain '('
             if (s.contains("(")) {
+                System.out.print("contain(");
                 String temp = s.substring(s.indexOf("(") + 1);
-                if (!temp.contains("(")) {
-                    temp = s.substring(0, s.indexOf(")") - 1);
-                    String temp2 = s.substring(s.indexOf("("), s.indexOf(")") + 1);
-                    return s.replace(temp2, calculate(temp));
+                System.out.println(temp);
+                String substring = s.substring(s.indexOf("("), s.indexOf(")") + 1);
+                System.out.println(substring);
+
+                //if the string still contain '('
+                if(temp.contains("(")){
+                    System.out.println("still!!!!! contain (");
+                    //if the next signal is '(' not ')'
+                    //which means it is something like '(aa(' that still need to calculate the inside
+                    if (s.indexOf("(") < s.indexOf(")")) {
+                        System.out.println("( before )");
+                        return s.substring(0,s.indexOf("(")-1)+calculate(s.substring(s.indexOf("(")));
+                    }
+                    //if the next signal is ')' not '('
+                    //which means it is something like 'aa)' that the end of Priority
+                    if(s.indexOf("(") > s.indexOf(")"))
+                    return calculate(calculate(s.substring(0,s.indexOf(")")-1))+s.substring(0,s.indexOf(")")));
                 }
-                if (s.indexOf("(") < s.indexOf(")")) {
-                    return s.replace(temp, calculate(temp));
-                }
+
             }
 
-            screen2.setText(String.format("%s  part2", screen2.getText()));
-            String substring = s.substring(s.indexOf(" ") + 1);
-            String s3 = substring.substring(0, s.indexOf(" ") + substring.indexOf(" "));
-            if (s.contains("*") || s.contains("/")) {
-                screen2.setText(String.format("%s  contain */ ", screen2.getText()));
-                if ((s.indexOf(" ") + 1) == s.indexOf("*") ||
-                        (s.indexOf(" ") + 1) == s.indexOf("/")
-                ) {
-                    screen2.setText(String.format("%s  1st */ ", screen2.getText()));
-                    double result = 0;
-                    String s1, s2;
-                    s1 = s.substring(0, s.indexOf(" "));
-                    screen2.setText(String.format(s1, screen2.getText()));
-                    val0 = Double.parseDouble(s1);
-                    if (substring.contains(" ")) {
-                        s2 = substring.substring(0, substring.indexOf(" "));
-                    } else {
-                        s2 = substring;
-                    }
-                    val1 = Double.parseDouble(s2);
-                    screen2.setText(String.format(s2, screen2.getText()));
-
-                    if ((s.indexOf(" ") + 1) == s.indexOf("*")) {
-                        result = val0 * val1;
-                    } else if ((s.indexOf(" ") + 1) == s.indexOf("/")) {
-                        result = val0 / val1;
-                    }
-                    //else{                            screen2.setText(String.format("%s \n */error", screen2.getText()));}
-
-                    String res = Double.toString(result);
-                    screen2.setText(String.format(res, screen2.getText()));
-                    return s.replace(s3, res);
-
-                } else {
-                    String temp = s.substring(s.indexOf(" ") + 1);
-                    return s.replace(temp, calculate(temp));
+            //case with out any (
+            else {
+                if (s.contains(")")){
+                    System.out.print("calculate error");
+                    screen.setText(String.format("%s input error", screen.getText()));
                 }
-            }
 
-            //screen2.setText(String.format("%s  part3 ", screen2.getText()));
-            if ((s.contains("+") || s.contains("-"))
-                    && !(s.contains("*") && s.contains("/"))) {
-                //screen2.setText(String.format("%s contain+-", screen2.getText()));
-                double result = 0;
-                //screen2.setText(String.format("%s new res", screen2.getText()));
-                String s1, s2;
-                //screen2.setText(String.format("%s new s1s2", screen2.getText()));
+                //the 1st num in the string and convert it into int
+                String s1;
                 s1 = s.substring(0, s.indexOf(" "));
-                screen2.setText(String.format(s1, screen2.getText()));
-                val0 = Double.parseDouble(s1);
-                //screen2.setText(String.format("%s double", screen2.getText()));
-                if (substring.contains(" ")) {
-                    screen2.setText(String.format("%s  contain blank", screen2.getText()));
-                    s2 = substring.substring(0, substring.indexOf(" "));
-                } else {
-                    screen2.setText(String.format("%s  not contain blank", screen2.getText()));
-                    s2 = substring;
-                }
-                val1 = Double.parseDouble(s2);
 
-                screen2.setText(String.format(s2, screen2.getText()));
-                if ((s.indexOf(" ") + 1) == s.indexOf("+")) {
-                    screen2.setText(String.format("%s  calculate +", screen2.getText()));
-                    result = val0 + val1;
-                } else if ((s.indexOf(" ") + 1) == s.indexOf("-")) {
-                    screen2.setText(String.format("%s  calculate -", screen2.getText()));
-                    result = val0 - val1;
+                //the operation
+                String op = s.substring(s.indexOf(" "),s.indexOf(" ") + 2);
+                //let the 2ed num be the string after 1st operation
+                String s2=s.substring(s.indexOf(" ")+1);;
+                //string of two value and one opertaion
+                String s3 = null;
+                //if there still any operation in the 2nd num
+                if(s2.contains(" ")) {
+                     s2= s2.substring(0,s2.indexOf(" "));
+                     s3= s.substring(0, s.indexOf(" ") + s2.length());
                 }
 
-                String res = Double.toString(result);
-                screen2.setText(String.format(res, screen2.getText()));
-                return s.replace(s3, res);
+                System.out.println(s3);
+
+                //the result that will return
+                double result = 0;
+                //if there is * or /
+                 System.out.println("***///");
+                if (s.contains("*") || s.contains("/")) {
+                    //if the 1st op is */
+                    if (op.equals("*")||op.equals("/")
+                    ) {
+                        System.out.println("1st op is */");
+
+                        try {
+                            val0 = Double.parseDouble(s1);
+                            val1 = Double.parseDouble(s2);
+                        } catch (Exception e) {
+                            System.out.println("error: */");
+                        }
+                        if (op.equals("*")) {
+                            result = val0 * val1;
+                        }
+                        if (op.equals("/")) {
+                            result = val0 / val1;
+                        }
+                        String res = Double.toString(result);
+                        return calculate(res+s3);
+                    }
+
+                }
+
+                //if there is  + or -
+                if ((s.contains("+") || s.contains("-"))
+                        ) {
+                    //if(s.contains("*") && s.contains("/")){
+                        //System.out.println("+- error");
+                        try {
+                            val0 = Double.parseDouble(s1);
+                            val1 = Double.parseDouble(calculate(s2));
+                        }
+                        catch(Exception e){
+                            System.out.println("error: +-");
+                        }
+                    if(op.equals("+")){
+                        result= val0 + val1;
+                    }
+                    if(op.equals("+")){
+                        result= val0 - val1;
+                    }
+                    String res = Double.toString(result);
+                    return calculate(res+s3);
+                }
             }
-
+        }
+        if(!isNum(s)){
+            screen.setText(String.format("%s input error", screen.getText()));
         }
         return s;
     }
