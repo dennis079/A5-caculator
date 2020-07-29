@@ -1,3 +1,6 @@
+import java.util.Scanner;
+
+
 public class A{
     private String calculate(String s) {
         double val0 = 0;
@@ -10,25 +13,43 @@ public class A{
 
             //if the string still contain '('
             if (s.contains("(")) {
-                System.out.print("contain(");
-                String temp = s.substring(s.indexOf("(") + 1);
-                System.out.println(temp);
-                String substring = s.substring(s.indexOf("("), s.indexOf(")") + 1);
-                System.out.println(substring);
+                //System.out.println("contain(");
+                //the string after "("
+                String sAfter = s.substring(s.indexOf("(") + 1);
+                //the string before "("
+                String sBefore = s.substring(0,s.indexOf("(") -1);
+                //the String after ")"
+                String sAftR="";
+                if(s.indexOf(")")!=s.length()-1){
+                    s.substring(s.indexOf(")")+1);
+                }
+                //the String before ")"
+                String sBefR=sAfter.substring(0,sAfter.indexOf(")")-1);
+
+                //System.out.println(sAfter);
+                //System.out.println(sBefore);
+                //System.out.println(sAftR);
+                //System.out.println(sBefR);
 
                 //if the string still contain '('
-                if(temp.contains("(")){
-                    System.out.println("still!!!!! contain (");
+                if(sAfter.contains("(")){
+                    //System.out.println("still!!!!! contain (");
                     //if the next signal is '(' not ')'
                     //which means it is something like '(aa(' that still need to calculate the inside
                     if (s.indexOf("(") < s.indexOf(")")) {
-                        System.out.println("( before )");
-                        return s.substring(0,s.indexOf("(")-1)+calculate(s.substring(s.indexOf("(")));
+                        //System.out.println("( before )");
+                        return calculate(sBefore+calculate(sAfter));
                     }
                     //if the next signal is ')' not '('
                     //which means it is something like 'aa)' that the end of Priority
                     if(s.indexOf("(") > s.indexOf(")"))
-                        return calculate(calculate(s.substring(0,s.indexOf(")")-1))+s.substring(0,s.indexOf(")")));
+                        return calculate(sBefore+calculate(sBefR)+sAftR);
+                }
+                if(s.contains(")")){
+                    return calculate(sBefore+calculate(sBefR)+sAftR);
+                }
+                else{
+                    return "error!!!!!!!";
                 }
 
             }
@@ -37,7 +58,7 @@ public class A{
             else {
                 if (s.contains(")")){
                     System.out.print("calculate error");
-                    screen.setText(String.format("%s input error", screen.getText()));
+                    //screen.setText(String.format("%s input error", screen.getText()));
                 }
 
                 //the 1st num in the string and convert it into int
@@ -45,43 +66,56 @@ public class A{
                 s1 = s.substring(0, s.indexOf(" "));
 
                 //the operation
-                String op = s.substring(s.indexOf(" "),s.indexOf(" ") + 2);
+                String op = s.substring(s.indexOf(" ")+1,s.indexOf(" ") + 2);
                 //let the 2ed num be the string after 1st operation
-                String s2=s.substring(s.indexOf(" ")+1);;
-                //string of two value and one opertaion
-                String s3 = null;
+                String s2=s.substring(s.indexOf(" ")+2);
+                //string after the operationed string
+                String s3 = "";
                 //if there still any operation in the 2nd num
                 if(s2.contains(" ")) {
+                    s3= s2.substring(s2.indexOf(" "));
                     s2= s2.substring(0,s2.indexOf(" "));
-                    s3= s.substring(0, s.indexOf(" ") + s2.length());
+
                 }
 
-                System.out.println(s3);
+
+                //System.out.println(s1);
+                //System.out.println(s2);
+                //System.out.println(op);
+                //System.out.println(s3);
+
 
                 //the result that will return
                 double result = 0;
                 //if there is * or /
-                System.out.println("***///");
+
                 if (s.contains("*") || s.contains("/")) {
                     //if the 1st op is */
+                    //System.out.println("***///");
                     if (op.equals("*")||op.equals("/")
                     ) {
-                        System.out.println("1st op is */");
+                        //System.out.println("1st op is */");
 
                         try {
                             val0 = Double.parseDouble(s1);
                             val1 = Double.parseDouble(s2);
                         } catch (Exception e) {
-                            System.out.println("error: */");
+                            //System.out.println("error: */");
                         }
                         if (op.equals("*")) {
+                            //System.out.println("*");
                             result = val0 * val1;
                         }
                         if (op.equals("/")) {
+                            //System.out.println("/");
                             result = val0 / val1;
                         }
-                        String res = Double.toString(result);
+                        String res=String.format("%.2f",result);
+                        //String res = Double.toString(result);
+                        //System.out.println(res);
                         return calculate(res+s3);
+                    }else{
+                        return calculate(s.substring(0,s.indexOf(" ")+2)+calculate(s.substring(s.indexOf(" ")+2)));
                     }
 
                 }
@@ -89,9 +123,11 @@ public class A{
                 //if there is  + or -
                 if ((s.contains("+") || s.contains("-"))
                 ) {
+                    //System.out.println("+++---");
                     //if(s.contains("*") && s.contains("/")){
                     //System.out.println("+- error");
                     try {
+                        //System.out.println("try");
                         val0 = Double.parseDouble(s1);
                         val1 = Double.parseDouble(calculate(s2));
                     }
@@ -99,35 +135,37 @@ public class A{
                         System.out.println("error: +-");
                     }
                     if(op.equals("+")){
+                        //System.out.println("+");
                         result= val0 + val1;
                     }
-                    if(op.equals("+")){
+                    if(op.equals("-")){
+                        //System.out.println("-");
                         result= val0 - val1;
                     }
                     String res = Double.toString(result);
+                    //System.out.println(res);
                     return calculate(res+s3);
                 }
             }
         }
-        if(!isNum(s)){
-            screen.setText(String.format("%s input error", screen.getText()));
-        }
+        //if(!isNum(s)){
+            //System.out.println("input error");
+            //screen.setText(String.format("%s input error", screen.getText()));
+        //}
         return s;
     }
 
     public static  void main(String [] argv) {
-        MainActivity a = new MainActivity();
-        String afm = argv[0];
-        afm.replace("(", " (");
-        afm.replace(")", " )");
-        afm.replace("+", " +");
-        afm.replace("-", " -");
-        afm.replace("*", " *");
-        afm.replace("/", " /");
-        //if there is a calculate loop error
-        int count = 0;
-        a.calculate(afm);
-        System.out.println(afm);
+        A a = new A();
+        System.out.println(a.calculate("1 +1"));
+        System.out.println(a.calculate("1 *3"));
+        System.out.println(a.calculate("2 *3 /4"));
+        System.out.println(a.calculate("2 * (3 +4 )"));
+        System.out.println(a.calculate("2 * (3 / (4 +1 ) )"));
+        System.out.println(a.calculate("2 +3 /4"));
+        System.out.println(a.calculate("2 +3 /4 -1"));
+
+
         /*
         while (!a.isNum(afm) || count == 1000) {
             a.calculate(afm);

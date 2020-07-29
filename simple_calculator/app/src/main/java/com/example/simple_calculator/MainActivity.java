@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     boolean first = true;
 
     //to record the previous value of calculation
-    String past;
+    String past="";
     //-----------------------end of variables---------------------
 
     //------------------------Constructors-----------------------------------
@@ -71,13 +71,12 @@ public class MainActivity extends AppCompatActivity {
 
         screen2 = (TextView) findViewById(R.id.screen2);
         screen2.setText("");
-        screen2.setText(String.format("%s welcome", screen2.getText()));
+        screen2.setText(String.format("%s past", screen2.getText()));
 
 
         screen = (TextView) findViewById(R.id.screen);
         screen.setText("");
-        screen.setText(String.format("%s Have a " +
-                "good day", screen.getText()));
+        screen.setText(String.format("present", screen.getText()));
 
         //set bottom
         num0.setOnClickListener(new View.OnClickListener() {
@@ -262,7 +261,9 @@ public class MainActivity extends AppCompatActivity {
         if (first) {
             //screen.setText(String.format("%s  wrong del", screen.getText()));
             screen.setText("");
-            screen2.setText("");
+            screen2.setText(String.format("%s \n", screen2.getText()));
+            screen2.setText(String.format(past, screen2.getText()));
+            //screen2.setText("");
             first = false;
         }
     }
@@ -276,14 +277,16 @@ public class MainActivity extends AppCompatActivity {
 
     //to check if the string is number or not
     private boolean isNum(String s) {
-        //boolean isNumber=false;
+        boolean isNumber=false;
+
         for (int i = 0; i <= 10; i++) {
-            if (!s.equals(number[i])) {
-                return false;
+            if (s.equals(number[i])) {
+                isNumber = true;
+                break;
             }
             //isNumber= s.equals(number[i]);
         }
-        return true;
+        return isNumber;
     }
 
     //the method of calculation
@@ -292,16 +295,14 @@ public class MainActivity extends AppCompatActivity {
         int count=0;
         //screen2.setText(String.format("%s original \n", screen2.getText()));
         String xxx = (String) screen.getText();
-        calculate(xxx);
-
-        //set screen past to show the equation that have be calculated
-        screen2.setText(String.format("%s  calculates", screen2.getText()));
+        String res=calculate(xxx);
 
         //show the result in screen present with signal "="
-        screen.setText(String.format("%s  =", screen.getText()));
-        past = xxx;
+        past = xxx+"="+res;
+        screen.setText(String.format(past, screen.getText()));
         first = true;
         //resetC();
+
     }
 
     private String calculate(String s) {
@@ -315,25 +316,43 @@ public class MainActivity extends AppCompatActivity {
 
             //if the string still contain '('
             if (s.contains("(")) {
-                System.out.print("contain(");
-                String temp = s.substring(s.indexOf("(") + 1);
-                System.out.println(temp);
-                String substring = s.substring(s.indexOf("("), s.indexOf(")") + 1);
-                System.out.println(substring);
+                //System.out.println("contain(");
+                //the string after "("
+                String sAfter = s.substring(s.indexOf("(") + 1);
+                //the string before "("
+                String sBefore = s.substring(0,s.indexOf("(") -1);
+                //the String after ")"
+                String sAftR="";
+                if(s.indexOf(")")!=s.length()-1){
+                    s.substring(s.indexOf(")")+1);
+                }
+                //the String before ")"
+                String sBefR=sAfter.substring(0,sAfter.indexOf(")")-1);
+
+                //System.out.println(sAfter);
+                //System.out.println(sBefore);
+                //System.out.println(sAftR);
+                //System.out.println(sBefR);
 
                 //if the string still contain '('
-                if(temp.contains("(")){
-                    System.out.println("still!!!!! contain (");
+                if(sAfter.contains("(")){
+                    //System.out.println("still!!!!! contain (");
                     //if the next signal is '(' not ')'
                     //which means it is something like '(aa(' that still need to calculate the inside
                     if (s.indexOf("(") < s.indexOf(")")) {
-                        System.out.println("( before )");
-                        return s.substring(0,s.indexOf("(")-1)+calculate(s.substring(s.indexOf("(")));
+                        //System.out.println("( before )");
+                        return calculate(sBefore+calculate(sAfter));
                     }
                     //if the next signal is ')' not '('
                     //which means it is something like 'aa)' that the end of Priority
                     if(s.indexOf("(") > s.indexOf(")"))
-                    return calculate(calculate(s.substring(0,s.indexOf(")")-1))+s.substring(0,s.indexOf(")")));
+                        return calculate(sBefore+calculate(sBefR)+sAftR);
+                }
+                if(s.contains(")")){
+                    return calculate(sBefore+calculate(sBefR)+sAftR);
+                }
+                else{
+                    return "error!!!!!!!";
                 }
 
             }
@@ -342,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
             else {
                 if (s.contains(")")){
                     System.out.print("calculate error");
-                    screen.setText(String.format("%s input error", screen.getText()));
+                    //screen.setText(String.format("%s input error", screen.getText()));
                 }
 
                 //the 1st num in the string and convert it into int
@@ -350,73 +369,92 @@ public class MainActivity extends AppCompatActivity {
                 s1 = s.substring(0, s.indexOf(" "));
 
                 //the operation
-                String op = s.substring(s.indexOf(" "),s.indexOf(" ") + 2);
+                String op = s.substring(s.indexOf(" ")+1,s.indexOf(" ") + 2);
                 //let the 2ed num be the string after 1st operation
-                String s2=s.substring(s.indexOf(" ")+1);;
-                //string of two value and one opertaion
-                String s3 = null;
+                String s2=s.substring(s.indexOf(" ")+2);
+                //string after the operationed string
+                String s3 = "";
                 //if there still any operation in the 2nd num
                 if(s2.contains(" ")) {
-                     s2= s2.substring(0,s2.indexOf(" "));
-                     s3= s.substring(0, s.indexOf(" ") + s2.length());
+                    s3= s2.substring(s2.indexOf(" "));
+                    s2= s2.substring(0,s2.indexOf(" "));
+
                 }
 
-                System.out.println(s3);
+
+                //System.out.println(s1);
+                //System.out.println(s2);
+                //System.out.println(op);
+                //System.out.println(s3);
+
 
                 //the result that will return
                 double result = 0;
                 //if there is * or /
-                 System.out.println("***///");
+
                 if (s.contains("*") || s.contains("/")) {
                     //if the 1st op is */
+                    //System.out.println("***///");
                     if (op.equals("*")||op.equals("/")
                     ) {
-                        System.out.println("1st op is */");
+                        //System.out.println("1st op is */");
 
                         try {
                             val0 = Double.parseDouble(s1);
                             val1 = Double.parseDouble(s2);
                         } catch (Exception e) {
-                            System.out.println("error: */");
+                            //System.out.println("error: */");
                         }
                         if (op.equals("*")) {
+                            //System.out.println("*");
                             result = val0 * val1;
                         }
                         if (op.equals("/")) {
+                            //System.out.println("/");
                             result = val0 / val1;
                         }
-                        String res = Double.toString(result);
+                        String res=String.format("%.2f",result);
+                        //String res = Double.toString(result);
+                        //System.out.println(res);
                         return calculate(res+s3);
+                    }else{
+                        return calculate(s.substring(0,s.indexOf(" ")+2)+calculate(s.substring(s.indexOf(" ")+2)));
                     }
 
                 }
 
                 //if there is  + or -
                 if ((s.contains("+") || s.contains("-"))
-                        ) {
+                ) {
+                    //System.out.println("+++---");
                     //if(s.contains("*") && s.contains("/")){
-                        //System.out.println("+- error");
-                        try {
-                            val0 = Double.parseDouble(s1);
-                            val1 = Double.parseDouble(calculate(s2));
-                        }
-                        catch(Exception e){
-                            System.out.println("error: +-");
-                        }
-                    if(op.equals("+")){
-                        result= val0 + val1;
+                    //System.out.println("+- error");
+                    try {
+                        //System.out.println("try");
+                        val0 = Double.parseDouble(s1);
+                        val1 = Double.parseDouble(calculate(s2));
+                    }
+                    catch(Exception e){
+                        System.out.println("error: +-");
                     }
                     if(op.equals("+")){
+                        //System.out.println("+");
+                        result= val0 + val1;
+                    }
+                    if(op.equals("-")){
+                        //System.out.println("-");
                         result= val0 - val1;
                     }
                     String res = Double.toString(result);
+                    //System.out.println(res);
                     return calculate(res+s3);
                 }
             }
         }
-        if(!isNum(s)){
-            screen.setText(String.format("%s input error", screen.getText()));
-        }
+        //if(!isNum(s)){
+        //System.out.println("input error");
+        //screen.setText(String.format("%s input error", screen.getText()));
+        //}
         return s;
     }
 }
