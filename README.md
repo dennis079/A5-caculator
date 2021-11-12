@@ -15,7 +15,7 @@ also include a vide that I introduce the calculator
 commont:
 
 I am not sure what does the requirement of design diagram want.
-I know how to do it for the states machine, but for a calculator I am refused.
+I know how to do it for the states machine, but for a calculator I am confused.
 
 architecture of my project:
 
